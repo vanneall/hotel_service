@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS employee_entity (
+    id VARCHAR(255) PRIMARY KEY
+);

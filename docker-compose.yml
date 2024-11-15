@@ -1,0 +1,42 @@
+version: '3.1'
+
+volumes:
+  pg_order:
+  rabbitmq_data:
+
+services:
+  tasks_db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=tasks_db
+    volumes:
+      - pg_order:/val/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: 1234
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+
+#  app:
+#    restart: always
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - tasks_db
+#    environment:
+#      SPRING_DATASOURCE_URL: 'jdbc:postgresql://tasks_db:5432/tasks_db'
+#      JAVA_OPTS: '-Xmx512m'
