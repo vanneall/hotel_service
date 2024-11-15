@@ -29,14 +29,36 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  kitchen-service:
+    restart: always
+    build:
+      context: ./kitchen
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq  # Имя контейнера RabbitMQ
+      SPRING_RABBITMQ_PORT: 5672        # Порт AMQP
+      SPRING_RABBITMQ_USERNAME: user # Пользователь RabbitMQ
+      SPRING_RABBITMQ_PASSWORD: 1234 # Пароль RabbitMQ
+      JAVA_OPTS: '-Xmx512m'
 
-#  app:
-#    restart: always
-#    build: .
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - tasks_db
-#    environment:
-#      SPRING_DATASOURCE_URL: 'jdbc:postgresql://tasks_db:5432/tasks_db'
-#      JAVA_OPTS: '-Xmx512m'
+  tasks-service:
+    restart: always
+    build:
+      context: ./tasks
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbitmq
+      - tasks_db
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://tasks_db:5432/tasks_db'
+      SPRING_RABBITMQ_HOST: rabbitmq  # Имя контейнера RabbitMQ
+      SPRING_RABBITMQ_PORT: 5672        # Порт AMQP
+      SPRING_RABBITMQ_USERNAME: user # Пользователь RabbitMQ
+      SPRING_RABBITMQ_PASSWORD: 1234 # Пароль RabbitMQ
+      JAVA_OPTS: '-Xmx512m'
